@@ -34,7 +34,7 @@ public class StatementPrinter {
                     NumberFormat.getCurrencyInstance(Locale.US).format(thisAmount / Constants.PERCENT_FACTOR),
                     performance.getAudience()));
         }
-        extracted(result, getTotalAmount());
+        usd(result, getTotalAmount());
         result.append(String.format("You earned %s credits%n", getTotalVolumeCredits()));
         return result.toString();
     }
@@ -59,7 +59,7 @@ public class StatementPrinter {
         return volumeCredits;
     }
 
-    private static void extracted(StringBuilder result, int totalAmount) {
+    private static void usd(StringBuilder result, int totalAmount) {
         result.append(String.format("Amount owed is %s%n", NumberFormat.getCurrencyInstance(Locale.US)
                 .format(totalAmount / Constants.PERCENT_FACTOR)));
     }
