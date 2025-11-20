@@ -22,30 +22,46 @@ public class StatementPrinter {
      * @throws RuntimeException if one of the play types is not known
      */
     public String statement() {
-        int totalAmount = 0;
-        int volumeCredits = 0;
         final StringBuilder result = new StringBuilder("Statement for " + invoice.getCustomer()
                 + System.lineSeparator());
-
-        final NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
-
         for (Performance performance : invoice.getPerformances()) {
 
             int thisAmount = 0;
             thisAmount = getAmount(performance, getPlay(performance));
 
-            // add volume credits
-            volumeCredits += getVolumeCredits(performance);
-
             // print line for this order
             result.append(String.format("  %s: %s (%s seats)%n", getPlay(performance).getName(),
-                    frmt.format(thisAmount / Constants.PERCENT_FACTOR),
+                    NumberFormat.getCurrencyInstance(Locale.US).format(thisAmount / Constants.PERCENT_FACTOR),
                     performance.getAudience()));
+        }
+        extracted(result, getTotalAmount());
+        result.append(String.format("You earned %s credits%n", getTotalVolumeCredits()));
+        return result.toString();
+    }
+
+    private int getTotalAmount() {
+        int totalAmount = 0;
+        for (Performance performance : invoice.getPerformances()) {
+
+            int thisAmount = 0;
+            thisAmount = getAmount(performance, getPlay(performance));
             totalAmount += thisAmount;
         }
-        result.append(String.format("Amount owed is %s%n", frmt.format(totalAmount / Constants.PERCENT_FACTOR)));
-        result.append(String.format("You earned %s credits%n", volumeCredits));
-        return result.toString();
+        return totalAmount;
+    }
+
+    private int getTotalVolumeCredits() {
+        int volumeCredits = 0;
+        for (Performance performance : invoice.getPerformances()) {
+            // add volume credits
+            volumeCredits += getVolumeCredits(performance);
+        }
+        return volumeCredits;
+    }
+
+    private static void extracted(StringBuilder result, int totalAmount) {
+        result.append(String.format("Amount owed is %s%n", NumberFormat.getCurrencyInstance(Locale.US)
+                .format(totalAmount / Constants.PERCENT_FACTOR)));
     }
 
     private int getVolumeCredits(Performance performance) {
